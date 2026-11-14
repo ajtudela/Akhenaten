@@ -649,39 +649,6 @@ void building_mastaba::complete_construction(const vec2i tiles_size) {
     js_event(mastaba_complete_ev{ id() }, params.name, "complete_construction");
 }
 
-bool building_mastaba::clay_delivery_enabled() {
-    return game_features::gameplay_change_mastaba_clay_delivery.to_bool();
-}
-
-bool building_mastaba::clay_stock_ready() const {
-    if (!clay_delivery_enabled()) {
-        return true;
-    }
-    const int need = needs_resource(RESOURCE_CLAY);
-    if (need <= 0) {
-        return true;
-    }
-    return resource_pct(RESOURCE_CLAY) >= 100;
-}
-
-int building_mastaba::needs_resource(e_resource resource) const {
-    return needs_resource(resource, runtime_data().phase);
-}
-
-int building_mastaba::needs_resource(e_resource resource, int phase) const {
-    if (resource == RESOURCE_CLAY && !clay_delivery_enabled()) {
-        return 0;
-    }
-    return building_monument::needs_resource(resource, phase);
-}
-
-bool building_mastaba::accepts_yard_delivery(e_resource resource) const {
-    if (resource == RESOURCE_CLAY) {
-        return clay_delivery_enabled();
-    }
-    return true;
-}
-
 int building_mastaba::try_assign_bricklayer(figure_id fid) {
     return mastaba_engine_try_assign_bricklayer(&base, fid);
 }
@@ -696,9 +663,6 @@ bool building_mastaba::need_bricklayers() {
     }
     auto &d = runtime_data();
     if (d.phase < MASTABA_PHASE_BRICKS) {
-        return false;
-    }
-    if (!clay_stock_ready()) {
         return false;
     }
     auto *ms = pyramid_main_state_get(id());

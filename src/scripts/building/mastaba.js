@@ -35,17 +35,16 @@ building_small_mastaba {
 
     // RESOURCE_NONE count = architects (ARCHITECTS). Phase 8 = finished.
     // Brick phases: blocks = OG block quota; BRICKS = blocks*100; workers drive guild spawn.
-    // CLAY quotas are remake-only (gameplay_change_mastaba_clay_delivery); OG hauled bricks only.
     construction {
         phases [
             { id: 0, resources: [ { resource: RESOURCE_NONE, count: 1 } ] }
             { id: 1, resources: [ { resource: RESOURCE_NONE, count: 1 } ] }
             { id: 2, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 3, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 2000 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 4, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 1600 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 5, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 1200 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 6, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 800 },  { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 7, blocks: 10, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 400 },  { resource: RESOURCE_BRICKS, count: 1000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 3, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 4, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 5, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 6, blocks: 9,  resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 900 } ],  workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 7, blocks: 10, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 1000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
             { id: 8, resources: [ { resource: RESOURCE_NONE, count: 0 } ] }
         ]
     }
@@ -136,11 +135,11 @@ building_small_mastaba {
             { id: 0, resources: [ { resource: RESOURCE_NONE, count: 1 } ] }
             { id: 1, resources: [ { resource: RESOURCE_NONE, count: 1 } ] }
             { id: 2, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 3, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 4000 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 4, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 3200 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 5, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 2400 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 6, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 1600 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 7, blocks: 21, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 800 },  { resource: RESOURCE_BRICKS, count: 2100 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 3, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 4, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 5, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 6, blocks: 20, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 2000 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 7, blocks: 21, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 2100 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
             { id: 8, resources: [ { resource: RESOURCE_NONE, count: 0 } ] }
         ]
     }
@@ -239,11 +238,11 @@ building_small_mastaba {
             { id: 0, resources: [ { resource: RESOURCE_NONE, count: 1 } ] }
             { id: 1, resources: [ { resource: RESOURCE_NONE, count: 1 } ] }
             { id: 2, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 3, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 6800 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 4, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 5600 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 5, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 4000 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 6, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 2800 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
-            { id: 7, blocks: 63, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_CLAY, count: 1400 }, { resource: RESOURCE_BRICKS, count: 6300 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 3, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 4, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 5, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 6, blocks: 62, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 6200 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
+            { id: 7, blocks: 63, resources: [ { resource: RESOURCE_NONE, count: 1 }, { resource: RESOURCE_BRICKS, count: 6300 } ], workers: [ { type: FIGURE_BRICKLAYER, count: 1 }, { type: FIGURE_LABORER, count: 1 } ] }
             { id: 8, resources: [ { resource: RESOURCE_NONE, count: 0 } ] }
         ]
     }

@@ -7,7 +7,6 @@
 #include "building/building_police_station.h"
 #include "city/city_industry.h"
 #include "building/rotation.h"
-#include "building/monuments.h"
 #include "city/buildings.h"
 #include "city/city_finance.h"
 #include "city/city.h"
@@ -36,7 +35,6 @@
 #include "game/game_config.h"
 #include "widget/city/ornaments.h"
 #include "figuretype/figure_storageyard_cart.h"
-#include "figuretype/figure_sled.h"
 #include "js/js_game.h"
 #include <cmath>
 
@@ -809,84 +807,6 @@ storage_worker_task building_storageyard_deliver_food_to_accepting_granary(build
     return {STORAGEYARD_TASK_NONE};
 }
 
-storage_worker_task building_storageyard_deliver_to_monuments(building *b) {
-    auto warehouse = b->dcast_storage_yard();
-    if (!warehouse) {
-        return { STORAGEYARD_TASK_NONE };
-    }
-
-    svector<building_monument*, 10> monuments;
-    buildings_valid_do([&] (building &b) { 
-        // Multi-part monuments (pyramids) share one resource pool on the head —
-        // only consider is_main() so we don't fill the list with corner/wall parts
-        // and point sleds at a 2×2 whose get_area used to miss the delivery tile.
-        if (!b.is_main()) {
-            return;
-        }
-        auto monument = b.dcast_monument();
-        if (!monument) {
-            return;
-        }
-
-        auto &monumentd = monument->runtime_data();
-        if (!monuments.full() && monumentd.phase != MONUMENT_FINISHED) {
-            monuments.push_back(monument);
-        }
-    });
-
-    if (monuments.empty()) {
-        return {STORAGEYARD_TASK_NONE};
-    }
-
-    auto space = warehouse->room();
-    for (; space; space = space->next_room()) {
-        int available = space->stored_first().value;
-        if (!space->resource() || available <= 0) {
-            continue;
-        }
-
-        e_resource resource = space->resource();
-        if (g_city.resource.is_stockpiled(resource)) {
-            continue;
-        }
-
-        for (auto monument : monuments) {
-            if (!monument->accepts_yard_delivery(resource)) {
-                continue;
-            }
-            int needed = monument->needs_resource(resource);
-            if (needed <= 0) {
-                continue;
-            }
-            // Remaining after on-site % — without this a full-phase sled can
-            // overshoot / empty the yard in one trip.
-            auto& d = monument->runtime_data();
-            int on_site = needed * (int)d.resources_pct[resource] / 100;
-            int in_flight = building_monument_resource_in_delivery(&monument->base, resource);
-            int remaining = needed - on_site - in_flight;
-            if (remaining <= 0) {
-                continue;
-            }
-            const auto &yp = building_storage_yard::current_params();
-            const int sled_max = yp.monument_sled_max_load > 0 ? yp.monument_sled_max_load : 400;
-            const int marble_min = yp.marble_monument_min_haul > 0 ? yp.marble_monument_min_haul : 400;
-            // Caesareum help: WC haul marble only when ≥N sits in one SY space.
-            // Allow a smaller final trip when remaining < marble_min.
-            if (resource == RESOURCE_MARBLE && available < marble_min && remaining >= marble_min) {
-                continue;
-            }
-            int amount = std::min(available, remaining);
-            amount = std::min(amount, sled_max);
-            if (amount <= 0) {
-                continue;
-            }
-            return {STORAGEYARD_TASK_MONUMENT, &space->base, amount, resource, &monument->base};
-        }
-    }
-
-    return {STORAGEYARD_TASK_NONE};
-}
-
 storage_worker_task building_storage_yard_deliver_emptying_resources(building *b) {
     building_storage_yard *warehouse = b->dcast_storage_yard();
     if (!warehouse) {
@@ -926,7 +846,6 @@ storage_worker_task building_storage_yard::determine_worker_task() {
       &building_storage_yard::deliver_food_to_gettingup_granary, // deliver food to getting granary
       &building_storageyard_deliver_food_to_accepting_granary,   // deliver food to accepting granary
       &building_storage_yard_deliver_emptying_resources,         // emptying resource
-      &building_storageyard_deliver_to_monuments,                // monuments resource
     };
 
     for (const auto &action : actions) {
@@ -1024,27 +943,7 @@ void building_storage_yard::spawn_figure() {
         return;
     }
 
-    if (!base.has_figure(BUILDING_SLOT_SERVICE) && task.result == STORAGEYARD_TASK_MONUMENT) {
-        figure *leader = create_figure_with_destination(FIGURE_SLED_PULLER, task.dest, (e_figure_action)ACTION_50_SLED_PULLER_CREATED);
-        leader->set_direction_to(task.dest);
-        for (int i = 0; i < 5; ++i) {
-            figure *follower = create_figure_with_destination(FIGURE_SLED_PULLER, task.dest, (e_figure_action)ACTION_50_SLED_PULLER_CREATED);
-            follower->set_direction_to(task.dest);
-            follower->wait_ticks = i * 4;
-        }
-
-        figure *f = figure_create(FIGURE_SLED, base.tile, 0);
-        figure_sled *sled = smart_cast<figure_sled>(f);
-        sled->set_destination(task.dest);
-        sled->set_direction_to(task.dest);
-        sled->load_resource(task.resource, task.amount);
-        sled->base.leading_figure_id = leader->id;
-        if (auto *mm = task.dest->dcast_monument()) {
-            mm->add_delivery(f->id, task.resource, task.amount);
-        }
-        remove_resource(task.resource, task.amount);
-
-    } else if (!base.has_figure(BUILDING_SLOT_SERVICE)) {
+    if (!base.has_figure(BUILDING_SLOT_SERVICE)) {
         figure* f = figure_create(FIGURE_STORAGEYARD_CART, base.road_access, DIR_4_BOTTOM_LEFT);
         auto cart = smart_cast<figure_storageyard_cart>(f);
         verify_no_crash(cart);

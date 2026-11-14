@@ -271,10 +271,6 @@ bool building_caesareum::needs_resources() const {
     return false;
 }
 
-bool building_caesareum::accepts_yard_delivery(e_resource /*resource*/) const {
-    return false;
-}
-
 void building_caesareum::add_workers(figure_id fid) {
     figure *f = fid ? figure_get(fid) : nullptr;
     if (f) {
@@ -557,10 +553,6 @@ void building_caesareum::on_post_load() {
         return;
     }
     refresh_part_images();
-}
-
-void building_caesareum::on_destroy() {
-    building_monument_remove_all_deliveries(id());
 }
 
 void building_caesareum::on_phase_changed(int /*old_phase*/, int /*current*/) {

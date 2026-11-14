@@ -79,7 +79,6 @@ public:
     virtual bool need_artisan() override;
     virtual bool need_workers() const override;
     virtual bool needs_resources() const override;
-    virtual bool accepts_yard_delivery(e_resource) const override { return false; }
     virtual void add_workers(figure_id fid) override;
     virtual void remove_worker(figure_id fid) override;
     virtual tile2i center_point() const override;

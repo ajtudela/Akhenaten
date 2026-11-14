@@ -337,7 +337,6 @@ A new test binding goes into the matching domain file; a new domain file needs a
 | `__test_monument_add_resource(bid, resource, amount)` | boolean | Deliver resource units into monument (`deliver_resource`) |
 | `__test_monument_resource_pct(bid, resource)` | int | Monument `resources_pct[resource]` (0..100+; −1 if invalid) |
 | `__test_storage_yard_add_resource(bid, resource, amount)` | boolean | Force-stock a Storage Yard (bypass accept rules) |
-| `__test_storageyard_monument_task_resource(yard_bid)` | int | Resource id if yard would start a monument sled task, else 0 (stockpile check) |
 | `__test_yards_stored(resource)` / `__test_yards_stored_staffed(resource)` | int | City granite/etc. in yards (all / staffed only) |
 | `__test_building_current_image(bid)` | int | Monument `building_image_get()` |
 | `__test_camera_center_building(bid)` | undefined | Center camera on building / monument `center_point` |

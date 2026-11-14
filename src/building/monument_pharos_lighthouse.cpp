@@ -383,7 +383,6 @@ xstring building_pharos_lighthouse::demolish_blocked_message() const {
 }
 
 void building_pharos_lighthouse::on_destroy() {
-    building_monument_remove_all_deliveries(id());
     const vec2i ft = footprint_size();
     for (int dy = 0; dy < ft.y; dy++) {
         for (int dx = 0; dx < ft.x; dx++) {

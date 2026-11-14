@@ -73,17 +73,11 @@ public:
 
     virtual const monument &config() const override;
 
-    virtual int needs_resource(e_resource resource) const override;
-    virtual int needs_resource(e_resource resource, int phase) const override;
-    virtual bool accepts_yard_delivery(e_resource resource) const override;
     virtual bool need_workers() const override;
     virtual bool need_bricklayers() override;
     virtual int needs_bricklayers(int ph_id) const override;
     virtual int try_assign_bricklayer(figure_id fid) override;
     virtual void place_bricklayer_block(figure_id fid) override;
-
-    static bool clay_delivery_enabled();
-    bool clay_stock_ready() const;
 
     static void update_images(building *b, int curr_phase, const vec2i size_b);
     virtual void sync_visuals() override;

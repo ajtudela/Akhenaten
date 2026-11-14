@@ -227,26 +227,6 @@ static void __test_monument_set_halted(int bid, int halted) {
 }
 ANK_FUNCTION_2(__test_monument_set_halted);
 
-// Register a fake in-flight monument delivery (destination = main or part id).
-static void __test_monument_add_delivery(int bid, int walker_id, int resource, int loads) {
-    building* b = building_get(bid);
-    auto* mm = b ? b->dcast_monument() : nullptr;
-    if (!mm || loads <= 0) {
-        return;
-    }
-    mm->add_delivery(walker_id, resource, loads);
-}
-ANK_FUNCTION_4(__test_monument_add_delivery);
-
-static int __test_monument_resource_in_delivery(int bid, int resource) {
-    building* b = building_get(bid);
-    if (!b) {
-        return -1;
-    }
-    return building_monument_resource_in_delivery(b, resource);
-}
-ANK_FUNCTION_2(__test_monument_resource_in_delivery);
-
 static int __test_construction_blessing_cap(int bid) {
     building* b = building_get(bid);
     building* head = b ? b->main() : nullptr;
@@ -898,22 +878,6 @@ static void __test_monument_set_all_progress(int bid, int progress) {
     }
 }
 ANK_FUNCTION_2(__test_monument_set_all_progress);
-
-// Returns resource id if this yard would dispatch a monument sled task, else 0.
-// Used to assert stockpile blocks SY?monument delivery without waiting for spawn.
-storage_worker_task building_storageyard_deliver_to_monuments(building* b);
-static int __test_storageyard_monument_task_resource(int yard_bid) {
-    building* b = building_get(yard_bid);
-    if (!b || !b->dcast_storage_yard()) {
-        return 0;
-    }
-    storage_worker_task task = building_storageyard_deliver_to_monuments(b);
-    if (task.result != STORAGEYARD_TASK_MONUMENT || task.resource <= RESOURCE_NONE) {
-        return 0;
-    }
-    return (int)task.resource;
-}
-ANK_FUNCTION_1(__test_storageyard_monument_task_resource);
 
 static void __test_burial_provisions_clear() {
     for (int r = 0; r < RESOURCES_MAX; r++) {

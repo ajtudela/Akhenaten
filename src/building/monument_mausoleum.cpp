@@ -1117,10 +1117,6 @@ void building_mausoleum::on_place_update_tiles(int /*orientation*/, int variant)
     refresh_part_images();
 }
 
-void building_mausoleum::on_destroy() {
-    building_monument_remove_all_deliveries(id());
-}
-
 void building_mausoleum::update_day() {
     building_impl::update_day();
     if (!is_main() || is_finished()) {

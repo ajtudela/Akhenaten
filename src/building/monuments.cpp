@@ -51,15 +51,6 @@ io_buffer* iob_monuments_progress_grid = new io_buffer([](io_buffer* iob, size_t
     iob->bind(BIND_SIGNATURE_GRID, &g_monuments_progress_grid);
 });
 
-struct monument_delivery {
-    int walker_id;
-    int destination_id;
-    int resource;
-    int cartloads;
-};
-
-svector<monument_delivery, 32> g_monument_deliveries;
-
 bool building_monument::deliver_resource(e_resource resource, int amount) {
     // Always credit the chain head — yard/sled destination may be a corner/wall
     // part, while update_day / info UI read resources_pct only from main().
@@ -447,92 +438,6 @@ int building_monument::progress() {
     return 1;
 }
 
-static int delivery_in_use(const monument_delivery *delivery) {
-    return delivery->destination_id != 0;
-}
-
-void building_monument::add_delivery(int figure_id, int resource_id, int num_loads) {
-    g_monument_deliveries.push_back({0});
-    monument_delivery &delivery = g_monument_deliveries.back();
-
-    delivery.destination_id = id();
-    delivery.walker_id = figure_id;
-    delivery.resource = resource_id;
-    delivery.cartloads = num_loads;
-}
-
-bool building_monument_has_delivery_for_worker(int figure_id) {
-    for(auto &delivery: g_monument_deliveries) {
-        if (delivery.walker_id == figure_id && delivery.destination_id > 0) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void building_monument_remove_delivery(int figure_id) {
-    for(auto &delivery: g_monument_deliveries) {
-        if (delivery.walker_id == figure_id) {
-            delivery.destination_id = 0;
-        }
-    }
-
-    auto &delv = g_monument_deliveries;
-    delv.erase(std::remove_if(delv.begin(), delv.end(), [] (auto &d) { return !d.destination_id; }), delv.end());
-}
-
-void building_monument_remove_all_deliveries(int monument_id) {
-    for(auto &delivery: g_monument_deliveries) {
-        if (delivery.destination_id == monument_id) {
-            delivery.destination_id = 0;
-        }
-    }
-
-    auto &delv = g_monument_deliveries;
-    delv.erase(std::remove_if(delv.begin(), delv.end(), [] (auto &d) { return !d.destination_id; }), delv.end());
-}
-
-int building_monument_resource_in_delivery(int monument_id, int resource_id) {
-    int resources = 0;
-    for(auto &delivery: g_monument_deliveries) {
-        if (delivery.destination_id == monument_id &&
-            delivery.resource == resource_id) {
-            resources += delivery.cartloads;
-        }
-    }
-
-    return resources;
-}
-
-static int resource_in_delivery_multipart(building *b, int resource_id) {
-    int resources = 0;
-
-    while (b->prev_part_building_id) {
-        b = building_get(b->prev_part_building_id);
-    }
-
-    while (b->id) {
-        for(auto &delivery: g_monument_deliveries) {
-            if (delivery.destination_id == b->id &&
-                delivery.resource == resource_id) {
-                resources += delivery.cartloads;
-            }
-        }
-        b = building_get(b->next_part_building_id);
-    }
-
-    return resources;
-}
-
-int building_monument_resource_in_delivery(building *b, int resource_id)
-{
-    if (b->next_part_building_id || b->prev_part_building_id) {
-        return resource_in_delivery_multipart(b, resource_id);
-    } else {
-        return building_monument_resource_in_delivery(b->id, resource_id);
-    }
-}
-
 int building_monument_get_id(e_building_type type) {
     building *b = building_first_of_type(type);
     if (!b->is_monument()) {
@@ -667,15 +572,14 @@ int building_monument::module_type() {
     return d.upgrades;
 }
 
-io_buffer *iob_city_building_monuments = new io_buffer([] (io_buffer *iob, size_t version) {
-    int delivers_size = (int)g_monument_deliveries.size();
-    iob->bind(BIND_SIGNATURE_INT32, &delivers_size);
-    for (int i = 0; i < g_monument_deliveries.capacity(); ++i) {
-        monument_delivery &delivery = g_monument_deliveries[i];
-        iob->bind(BIND_SIGNATURE_INT32, &delivery.walker_id);
-        iob->bind(BIND_SIGNATURE_INT32, &delivery.destination_id);
-        iob->bind(BIND_SIGNATURE_INT32, &delivery.resource);
-        iob->bind(BIND_SIGNATURE_INT32, &delivery.cartloads);
+// Former storage-yard sled delivery table: no longer used, its slots are kept so saves keep their layout.
+io_buffer* iob_city_building_monuments = new io_buffer([](io_buffer* iob, size_t version) {
+    enum { UNUSED_DELIVERY_SLOTS = 32, UNUSED_DELIVERY_FIELDS = 4 };
+    int unused = 0;
+    iob->bind(BIND_SIGNATURE_INT32, &unused);
+    for (int i = 0; i < UNUSED_DELIVERY_SLOTS * UNUSED_DELIVERY_FIELDS; ++i) {
+        unused = 0;
+        iob->bind(BIND_SIGNATURE_INT32, &unused);
     }
 });
 

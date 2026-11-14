@@ -1212,7 +1212,6 @@ void building_alexandria_library::on_post_load() {
 }
 
 void building_alexandria_library::on_destroy() {
-    building_monument_remove_all_deliveries(id());
     if (is_main()) {
         work_spots().mark_unset();
     }

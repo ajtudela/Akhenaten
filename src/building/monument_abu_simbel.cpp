@@ -694,10 +694,6 @@ xstring building_abu_simbel::demolish_blocked_message() const {
     return "#abu_simbel_not_demolishable";
 }
 
-void building_abu_simbel::on_destroy() {
-    building_monument_remove_all_deliveries(id());
-}
-
 void building_abu_simbel::on_phase_changed(int /*old_phase*/, int current) {
     refresh_part_tiles();
 

@@ -120,6 +120,12 @@ static void __test_set_desirability(int x, int y, int value) {
 }
 ANK_FUNCTION_3(__test_set_desirability);
 
+// OG building_tiles.c: placed buildings keep 3 tiles inside the map and the play diamond.
+static int __test_map_inside_building_area(int x, int y) {
+    return map_grid_is_inside_building_area(tile2i(x, y)) ? 1 : 0;
+}
+ANK_FUNCTION_2(__test_map_inside_building_area);
+
 // Mark a road tile as plaza (same bookkeeping as building_plaza::planer_place).
 static void __test_plaza_mark_tile(int x, int y) {
     tile2i tile(x, y);

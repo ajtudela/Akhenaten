@@ -137,6 +137,8 @@ void scenario_data_t::load_metadata(const mission_id_t &missionid, bool is_new_m
 
         arch.r("invasion_points_land", invasion_points_land);
         arch.r("invasion_points_sea", invasion_points_sea);
+        // The criteria come from the mission script only; start clean so a previous mission's goals do not linger.
+        win_criteria = {};
         arch.r("win_criteria", win_criteria);
         arch.r("sounds", sounds);
 

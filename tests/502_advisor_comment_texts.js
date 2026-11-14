@@ -135,7 +135,7 @@ function t502_rest() {
     t502_expect('watching', W, {}, 178)
     t502_expect('no forces', W, { soldiers: -1 }, 177)
     var K = ADVISOR_COMMENT_KINGDOM
-    t502_expect('requests 0', K, {}, 191, ADVISOR_IMPERIAL)
+    t502_expect('requests 0', K, {}, 191, ADVISOR_KINGDOM)
     t502_expect('requests 2', K, { requests_waiting: 2 }, 190)
     t502_expect('requests 3', K, { requests_waiting: 3 }, 189)
     t502_expect('requests 4', K, { requests_waiting: 4 }, 189)

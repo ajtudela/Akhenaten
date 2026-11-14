@@ -1,15 +1,16 @@
 // Every building type must fit its save record: header + bind_dynamic get the first 186 bytes.
 // Each type is placed through the planner, then the city is saved and loaded back; the record bind
 // logs "[record-overflow]" for any type past the budget, which fails the test.
-// A type that does not fit at the cursor is tried a few tiles further; past the right edge the cursor
-// moves to the next row, past the bottom it starts again from the top. A type that finds no spot within
+// A type that does not fit at the cursor is tried a few tiles further; past the right edge the cursor moves to the
+// next row. It walks the middle half of the rows, where the play diamond is wide, and past the last of them starts
+// again from the first. Tiles outside the area OG lets buildings use (3 tiles inside the map and the diamond) are
+// skipped without spending a try. A type that finds no spot within
 // T484_MAX_TRIES leaves the cursor where it was, so the next type does not start in a bad corner.
 // Venues need a road junction, so booth, bandstand and pavilion get one first (same patterns as test 485).
 // Marker: [test-marker] building_record_size_all_types_ok
 
 var __t484_ok = false
 var T484_STEP = 3
-var T484_MARGIN = 4
 var T484_MAX_TRIES = 300
 
 var T484_VENUES = [
@@ -26,20 +27,32 @@ function t484_try_place(x, y) {
     city_planner.construction_start(x, y)
     city_planner.construction_update(x, y)
     city_planner.construction_finalize()
+    // Drag-placed types (houses, walls, statues...) do not set the planner's last created building, and roads, ditches
+    // or cleared land create none; they are still placed, so the cursor must move on (-1: placed, no record).
     var bid = city_planner.last_created_building_id()
     city_planner.validate_last_created()
-    return bid > 0 ? bid : 0
+    if (!(bid > 0)) {
+        bid = __building_at(x, y)
+    }
+    return bid > 0 ? bid : -1
+}
+
+function t484_step(cur, w, h) {
+    cur.x += T484_STEP
+    if (cur.x >= w) {
+        cur.x = 0
+        cur.y += T484_STEP
+        if (cur.y >= ((h * 3) / 4) | 0) {
+            cur.y = (h / 4) | 0
+        }
+    }
 }
 
 function t484_advance(cur, w, h) {
-    cur.x += T484_STEP
-    if (cur.x >= w - T484_MARGIN) {
-        cur.x = T484_MARGIN
-        cur.y += T484_STEP
-        if (cur.y >= h - T484_MARGIN) {
-            cur.y = T484_MARGIN
-        }
-    }
+    var limit = ((w * h) / (T484_STEP * T484_STEP)) | 0
+    do {
+        t484_step(cur, w, h)
+    } while (!__test_map_inside_building_area(cur.x, cur.y) && --limit > 0)
 }
 
 function t484_place_venue(v, x, y) {
@@ -76,7 +89,8 @@ function run_test() {
         }
     }
 
-    var cur = { x: T484_MARGIN, y: T484_MARGIN }
+    var cur = { x: 0, y: (h / 4) | 0 }
+    t484_advance(cur, w, h)
     var skipped = []
     for (var t = BUILDING_NONE + 1; t < BUILDING_MAX; t++) {
         if (placed_types[t] || !__building_static_config_name(t) || !test_planner_enter_build_mode(t)) {

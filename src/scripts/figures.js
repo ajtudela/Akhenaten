@@ -633,7 +633,6 @@ figure_sled {
 		bricks_ramp { id:179, max_frames:1 }
 		copper { pack:PACK_EXPANSION_SPR, id:27, max_frames:1 }
 		lamps { pack:PACK_EXPANSION_SPR, id:39, max_frames:1 }
-		big_image { pack:PACK_UNLOADED, id:25, offset:FIGURE_SLED }
 	}
 
 	resource_images [
@@ -648,7 +647,10 @@ figure_sled {
 	]
 	default_image { ground: "bricks", ramp: "bricks_ramp" }
 
-	category: figure_category_citizen
+	// OG Figure_model "Pulled Stone": category 0, never fought; enemy.c skips it as a missile target.
+	category: figure_category_inactive
+	ignored_by_enemy_missiles: true
+	no_portrait: true
 	max_damage: 10
 	terrain_usage: TERRAIN_USAGE_ANY,
 }
@@ -661,8 +663,9 @@ figure_sled_puller = {
 		big_image : { pack:PACK_UNLOADED, id:25, offset:FIGURE_SLED_PULLER }
 	}
 
-	category: figure_category_citizen
-	max_damage: 10
+	// OG Figure_model "Stone Puller": category 0, never fought in melee.
+	category: figure_category_inactive
+	max_damage: 100
 	terrain_usage: TERRAIN_USAGE_ANY,
 }
 

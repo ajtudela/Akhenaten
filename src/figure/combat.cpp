@@ -248,7 +248,7 @@ target_figure figure_combat_get_missile_target_for_enemy(figure* enemy, int max_
     figure* min_figure = 0;
     int min_distance = max_distance;
     for (figure* f: map_figures()) {
-        if (!f->is_valid() || f->is_dead()) {
+        if (!f->is_valid() || f->is_dead() || f->params().ignored_by_enemy_missiles) {
             continue;
         }
 

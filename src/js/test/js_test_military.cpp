@@ -1380,3 +1380,13 @@ static void __test_set_seth_protect_troops(int months) {
     g_city.religion.seth_protect_player_troops_months = (uint8_t)months;
 }
 ANK_FUNCTION_1(__test_set_seth_protect_troops);
+
+// Figure an enemy at fid would shoot at (figure_combat_get_missile_target_for_enemy), 0 when none.
+static int __test_enemy_missile_target(int fid, int max_distance) {
+    figure* f = figure_get(fid);
+    if (!f || !f->is_alive()) {
+        return 0;
+    }
+    return figure_combat_get_missile_target_for_enemy(f, max_distance, true).fid;
+}
+ANK_FUNCTION_2(__test_enemy_missile_target);

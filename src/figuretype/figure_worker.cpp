@@ -1622,6 +1622,11 @@ void figure_worker::update_animation() {
     }
 }
 
+// OG building_info.c draw_walker_info: a laborer with a partner reads as a sled puller.
+pcstr figure_worker::info_type_name() const {
+    return base.leading_figure_id ? figure_static_params::get(FIGURE_SLED_PULLER).name : params().name;
+}
+
 void figure_worker::on_destroy() {
     if (destination() && destination()->id) {
         if (auto *b = destination()->dcast()) {

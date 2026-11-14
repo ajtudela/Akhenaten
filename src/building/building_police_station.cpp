@@ -98,7 +98,7 @@ void building_police_station::spawn_figure() {
                 consume_resource(RESOURCE_WEAPONS, 1);
             }
         }
-        create_roaming_figure(FIGURE_CONSTABLE, (e_figure_action)ACTION_70_CONSTABLE_CREATED, BUILDING_SLOT_SERVICE);
+        create_roaming_figure(FIGURE_CONSTABLE, (e_figure_action)ACTION_70_LAW_WALKER_CREATED, BUILDING_SLOT_SERVICE);
     }
 }
 

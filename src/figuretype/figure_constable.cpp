@@ -8,7 +8,6 @@
 #include "figuretype/figure_native.h"
 #include "figuretype/figure_tomb_robber.h"
 #include "game/game_config.h"
-#include "grid/road_access.h"
 #include "grid/routing/routing.h"
 #include "js/js_game.h"
 
@@ -16,19 +15,25 @@
 
 REPLICATE_STATIC_PARAMS_FROM_CONFIG(figure_constable);
 
-void figure_constable::figure_before_action() {
-    building* h = home();
-    if (h->state != BUILDING_STATE_VALID || !h->has_figure(0, id())) {
-        poof();
-    }
-}
-
 void figure_constable::figure_action() {
     if (action_state() == ACTION_74_CONSTABLE_REQUESTING_WEAPONS && !base.in_attack()) {
         request_weapons_remake();
         return;
     }
-    law_walker_action(true);
+    law_walker_action();
+}
+
+void figure_constable::on_walk_cycle(bool wrapped) {
+    if (wrapped) {
+        fight_enemy();
+    }
+    arrest_tomb_robber_remake();
+}
+
+void figure_constable::on_attack_tick() {
+    if (base.attack_image_offset == 12) {
+        base.play_attack_sound();
+    }
 }
 
 // Remake police weapons (gameplay_change_police_weapons): the constable walks to a storage yard and leaves a
@@ -56,126 +61,7 @@ void figure_constable::request_weapons_remake() {
         }
     }
 
-    const tile2i road = home_road();
-    if (!road.valid()) {
-        poof();
-        return;
-    }
-    advance_action(ACTION_73_CONSTABLE_RETURNING);
-    base.destination_tile = road;
-    route_remove();
-}
-
-tile2i figure_constable::home_road() const {
-    const building* h = home();
-    return map_closest_road_within_radius(h->tile, h->size, current_params().home_road_radius);
-}
-
-void figure_constable::acquire_attack() {
-    base.set_flag(e_figure_flag_inattack);
-}
-
-void figure_constable::law_walker_action(bool is_constable) {
-    base.terrain_usage = TERRAIN_USAGE_ROADS;
-
-    auto& d = runtime_data();
-    const bool wrapped = ++d.walk_frame >= LAW_WALKER_ANIMATION_FRAMES;
-    if (wrapped) {
-        d.walk_frame = 0;
-    }
-    if (wrapped && is_constable) {
-        fight_enemy();
-    }
-    if (is_constable) {
-        arrest_tomb_robber_remake();
-    }
-
-    if (base.in_attack()) {
-        if (is_constable && base.attack_image_offset == 12) {
-            base.play_attack_sound();
-        }
-        base.figure_combat_handle_attack();
-        return;
-    }
-
-    switch (action_state()) {
-    case FIGURE_ACTION_149_CORPSE:
-        break;
-
-    case ACTION_76_CONSTABLE_CHASE:
-        law_walker_chase();
-        break;
-
-    case ACTION_70_CONSTABLE_CREATED: {
-        d.walk_frame = 0;
-        if (--base.wait_ticks > 0) {
-            break;
-        }
-        if (!home_road().valid()) {
-            poof();
-            break;
-        }
-        advance_action(ACTION_72_CONSTABLE_ROAMING);
-        base.roam_length = 0;
-        break;
-    }
-
-    case ACTION_71_CONSTABLE_ENTERING_EXITING:
-        do_enterbuilding(true, home());
-        break;
-
-    case ACTION_72_CONSTABLE_ROAMING:
-        if (++base.roam_length >= base.max_roam_length) {
-            const tile2i road = home_road();
-            if (!road.valid()) {
-                poof();
-            } else {
-                advance_action(ACTION_73_CONSTABLE_RETURNING);
-                base.destination_tile = road;
-                route_remove();
-            }
-        }
-        base.roam_ticks(base.speed_multiplier);
-        break;
-
-    case ACTION_73_CONSTABLE_RETURNING:
-        base.move_ticks(base.speed_multiplier);
-        if (direction() == DIR_FIGURE_REROUTE || direction() == DIR_FIGURE_CAN_NOT_REACH) {
-            poof();
-        } else if (direction() == DIR_FIGURE_NONE) {
-            advance_action(ACTION_71_CONSTABLE_ENTERING_EXITING);
-            base.destination_tile = home()->tile;
-            base.roam_length = 0;
-        }
-        break;
-
-    default:
-        advance_action(ACTION_70_CONSTABLE_CREATED);
-        break;
-    }
-}
-
-void figure_constable::law_walker_chase() {
-    base.terrain_usage = TERRAIN_USAGE_ANY;
-    if (!base.target_is_alive()) {
-        const tile2i road = home_road();
-        if (!road.valid()) {
-            poof();
-        } else {
-            advance_action(ACTION_73_CONSTABLE_RETURNING);
-            base.destination_tile = road;
-            route_remove();
-            base.roam_length = 0;
-        }
-    }
-
-    base.move_ticks(base.speed_multiplier);
-    if (direction() == DIR_FIGURE_REROUTE || direction() == DIR_FIGURE_CAN_NOT_REACH) {
-        poof();
-    } else if (direction() == DIR_FIGURE_NONE) {
-        base.destination_tile = figure_get(base.target_figure_id)->tile;
-        route_remove();
-    }
+    return_home();
 }
 
 bool figure_constable::fight_enemy() {
@@ -189,9 +75,9 @@ bool figure_constable::fight_enemy() {
 
     switch (action_state()) {
     case FIGURE_ACTION_149_CORPSE:
-    case ACTION_70_CONSTABLE_CREATED:
-    case ACTION_71_CONSTABLE_ENTERING_EXITING:
-    case ACTION_76_CONSTABLE_CHASE:
+    case ACTION_70_LAW_WALKER_CREATED:
+    case ACTION_71_LAW_WALKER_ENTERING_EXITING:
+    case ACTION_76_LAW_WALKER_CHASE:
         return false;
     }
 
@@ -208,7 +94,7 @@ bool figure_constable::fight_enemy() {
     }
 
     figure* enemy = figure_get(enemy_id);
-    advance_action(ACTION_76_CONSTABLE_CHASE);
+    advance_action(ACTION_76_LAW_WALKER_CHASE);
     base.destination_tile = enemy->tile;
     base.target_figure_id = enemy_id;
     enemy->targeted_by_figure_id = id();
@@ -225,9 +111,9 @@ void figure_constable::arrest_tomb_robber_remake() {
 
     switch (action_state()) {
     case FIGURE_ACTION_149_CORPSE:
-    case ACTION_70_CONSTABLE_CREATED:
-    case ACTION_71_CONSTABLE_ENTERING_EXITING:
-    case ACTION_76_CONSTABLE_CHASE:
+    case ACTION_70_LAW_WALKER_CREATED:
+    case ACTION_71_LAW_WALKER_ENTERING_EXITING:
+    case ACTION_76_LAW_WALKER_CHASE:
         return;
     }
 
@@ -250,8 +136,8 @@ void figure_constable::arrest_tomb_robber_remake() {
 
 figure_id figure_constable::closest_enemy(int max_distance) const {
     const auto& p = current_params();
-    std::array<figure_id, LAW_WALKER_MAX_ENEMY_CANDIDATES> ids;
-    std::array<int, LAW_WALKER_MAX_ENEMY_CANDIDATES> offsets;
+    std::array<figure_id, CONSTABLE_MAX_ENEMY_CANDIDATES> ids;
+    std::array<int, CONSTABLE_MAX_ENEMY_CANDIDATES> offsets;
     int count = 0;
 
     for (int i = 1; i < MAX_FIGURES; i++) {
@@ -259,7 +145,7 @@ figure_id figure_constable::closest_enemy(int max_distance) const {
         if (!f->is_alive() || f->targeted_by_figure_id != 0) {
             continue;
         }
-        if (count >= LAW_WALKER_MAX_ENEMY_CANDIDATES) {
+        if (count >= CONSTABLE_MAX_ENEMY_CANDIDATES) {
             break;
         }
 
@@ -293,17 +179,4 @@ figure_id figure_constable::closest_enemy(int max_distance) const {
 int figure_constable::provide_service() {
     base.min_max_seen = (uint8_t)figure_provide_crime_coverage(tile(), current_params().crime_reduction);
     return 0;
-}
-
-void figure_constable::update_animation() {
-    figure_impl::update_animation();
-
-    xstring anim_key = animkeys().walk;
-    if (action_state() == FIGURE_ACTION_149_CORPSE) {
-        anim_key = animkeys().death;
-    } else if (base.in_attack()) {
-        anim_key = animkeys().attack;
-    }
-
-    image_set_animation(anim_key);
 }

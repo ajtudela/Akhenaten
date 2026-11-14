@@ -136,7 +136,7 @@ function figure_constable_setup_phrase(ev) {
 	}
 
 	var state = f.action_state
-	// ACTION_76_CONSTABLE_CHASE — going to an enemy
+	// ACTION_76_LAW_WALKER_CHASE — going to an enemy
 	if (state == 76) {
 		figure_apply_phrase(f, "policeman_enemies_are_coming")
 		return

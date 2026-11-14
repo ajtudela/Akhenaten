@@ -503,7 +503,7 @@ void figure_worker::at_storage_yard_lamps() {
     base.roam_length = 0;
     base.animctx.frame = 0;
     route_remove();
-    pyramid_figure_spawn_single_sled(id(), tomb);
+    pyramid_figure_spawn_single_sled(id());
     advance_action(ACTION_36_LABORER_SLED_TO_TOMB);
 }
 
@@ -1258,14 +1258,14 @@ void figure_worker::figure_action() {
                 break;
             }
             base.destination_tile = road;
-            pyramid_figure_spawn_sled_train(id(), site_head);
+            pyramid_figure_spawn_sled_train(id());
             base.wait_ticks = 0;
             base.roam_length = 0;
             advance_action(laborer_cleopatra_actions(site_head).sled);
         } else if (uses_ramp_climb(b_dest)) {
             tile2i entry = ramp_entry_tile(b_dest);
             base.destination_tile = entry.valid() ? entry : mason->tile;
-            pyramid_figure_spawn_sled_train(id(), b_dest);
+            pyramid_figure_spawn_sled_train(id());
             base.wait_ticks = 0;
             advance_action(ACTION_30_LABORER_SLED_AT_RAMP);
         } else {
@@ -1579,6 +1579,7 @@ static int __worker_block_material_for(int monument_bid, int mason_fid) {
 }
 ANK_FUNCTION_2(__worker_block_material_for)
 
+// OG laborer.c update_image / laborer_image_group.
 void figure_worker::update_animation() {
     figure_impl::update_animation();
 
@@ -1590,36 +1591,32 @@ void figure_worker::update_animation() {
         image_set_animation(animkeys().work);
         break;
 
+    case FIGURE_ACTION_149_CORPSE:
+        image_set_animation(animkeys().death);
+        break;
+
+    case ACTION_7_CARTPUSHER_WAIT_FOR_FERRY:
+        image_set_animation(
+          base.action_state_before_attack == ACTION_17_LABORER_TO_PYRAMID ? animkeys().pulling : animkeys().walk);
+        break;
+
+    case ACTION_17_LABORER_TO_PYRAMID:
+    case ACTION_30_LABORER_SLED_AT_RAMP:
+        image_set_animation(base.leading_figure_id ? animkeys().pulling : animkeys().walk);
+        break;
+
+    case ACTION_19_LABORER_TO_MASON:
+    case ACTION_20_LABORER_WALK_TO_MASON:
     case ACTION_23_LABORER_SLED_TO_SUN_TEMPLE:
     case ACTION_26_LABORER_SLED_TO_MAUSOLEUM:
     case ACTION_31_LABORER_SLED_TO_LIBRARY:
     case ACTION_34_LABORER_SLED_TO_CAESAREUM:
     case ACTION_35_LABORER_SLED_TO_LIGHTHOUSE:
     case ACTION_36_LABORER_SLED_TO_TOMB:
-    case ACTION_15_LABORER_TO_STORAGE_YARD:
-    case ACTION_16_LABORER_AT_STORAGE_YARD:
-    case ACTION_17_LABORER_TO_PYRAMID:
-    case ACTION_18_LABORER_CLIMB_RAMP:
-    case ACTION_19_LABORER_TO_MASON:
-    case ACTION_20_LABORER_WALK_TO_MASON:
-    case ACTION_29_LABORER_DELIVERED:
-    case ACTION_30_LABORER_SLED_AT_RAMP:
         image_set_animation(animkeys().pulling);
         break;
 
-    case FIGURE_ACTION_149_CORPSE:
-        image_set_animation(animkeys().death);
-        break;
-
-    case ACTION_6_CARTPUSHER_ON_FERRY:
-    case ACTION_7_CARTPUSHER_WAIT_FOR_FERRY:
-    case ACTION_8_LABORER_IDLE:
-    case ACTION_13_LABORER_RETURNING:
-    case ACTION_9_LABORER_GOING_OUT:
-    case ACTION_10_LABORER_TO_FARM:
-    case ACTION_24_LABORER_TO_SUN_TEMPLE:
-    case ACTION_27_LABORER_TO_MAUSOLEUM:
-    case ACTION_32_LABORER_TO_LIBRARY:
+    default:
         image_set_animation(animkeys().walk);
         break;
     }

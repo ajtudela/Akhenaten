@@ -574,3 +574,17 @@ static int __test_figure_resource(int fid) {
     return f ? (int)f->get_resource() : -1;
 }
 ANK_FUNCTION_1(__test_figure_resource);
+
+static xstring __test_figure_anim_key(int fid) {
+    figure* f = figure_get(fid);
+    return f ? f->animctx.key : xstring();
+}
+ANK_FUNCTION_1(__test_figure_anim_key);
+
+static void __test_figure_set_resource(int fid, int resource) {
+    figure* f = figure_get(fid);
+    if (f && resource >= RESOURCE_NONE && resource < RESOURCES_MAX) {
+        f->resource_id = (e_resource)resource;
+    }
+}
+ANK_FUNCTION_2(__test_figure_set_resource);

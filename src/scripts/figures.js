@@ -614,19 +614,39 @@ figure_shipwreck = {
 	terrain_usage : TERRAIN_USAGE_ANY,
 }
 
+// OG figure_sled_action / figure_sled_puller_action (laborer.c): image groups minus 39 in SprMain,
+// minus 659 in SprMain2. A resource missing from resource_images uses default_image (OG bricks).
 figure_sled {
 	animations {
-		empty { pack:PACK_SPR_MAIN, id:166, max_frames:1 }
-		stone { pack:PACK_SPR_MAIN, id:167, max_frames:1 }
-		sandstone { pack:PACK_SPR_MAIN, id:168, max_frames:1 }
-		granite { pack:PACK_SPR_MAIN, id:169, max_frames:1 }
-		limestone { pack:PACK_SPR_MAIN, id:170, max_frames:1 }
-		clay { pack:PACK_SPR_MAIN, id:171, max_frames:1 }
-		bricks { pack:PACK_SPR_MAIN, id:172, max_frames:1 }
-		marble { pack:PACK_SPR_MAIN, id:170, max_frames:1 }
-		copper { pack:PACK_SPR_MAIN, id:167, max_frames:1 }
+		_pack { pack:PACK_SPR_MAIN }
+		stone { id:167, max_frames:1 }
+		limestone { id:168, max_frames:1 }
+		granite { id:169, max_frames:1 }
+		marble { id:170, max_frames:1 }
+		sandstone { id:171, max_frames:1 }
+		bricks { id:172, max_frames:1 }
+		stone_ramp { id:174, max_frames:1 }
+		limestone_ramp { id:175, max_frames:1 }
+		granite_ramp { id:176, max_frames:1 }
+		marble_ramp { id:177, max_frames:1 }
+		sandstone_ramp { id:178, max_frames:1 }
+		bricks_ramp { id:179, max_frames:1 }
+		copper { pack:PACK_EXPANSION_SPR, id:27, max_frames:1 }
+		lamps { pack:PACK_EXPANSION_SPR, id:39, max_frames:1 }
 		big_image { pack:PACK_UNLOADED, id:25, offset:FIGURE_SLED }
 	}
+
+	resource_images [
+		{ resource: RESOURCE_STONE, ground: "stone", ramp: "stone_ramp" }
+		{ resource: RESOURCE_LIMESTONE, ground: "limestone", ramp: "limestone_ramp" }
+		{ resource: RESOURCE_GRANITE, ground: "granite", ramp: "granite_ramp" }
+		{ resource: RESOURCE_MARBLE, ground: "marble", ramp: "marble_ramp" }
+		{ resource: RESOURCE_SANDSTONE, ground: "sandstone", ramp: "sandstone_ramp" }
+		{ resource: RESOURCE_BRICKS, ground: "bricks", ramp: "bricks_ramp" }
+		{ resource: RESOURCE_COPPER, ground: "copper", ramp: "bricks_ramp" }
+		{ resource: RESOURCE_LAMPS, ground: "lamps", ramp: "bricks_ramp" }
+	]
+	default_image { ground: "bricks", ramp: "bricks_ramp" }
 
 	category: figure_category_citizen
 	max_damage: 10
@@ -635,7 +655,9 @@ figure_sled {
 
 figure_sled_puller = {
 	animations : {
-		walk : { pack:PACK_SPR_MAIN, id:121, max_frames:12 }
+		_pack { pack:PACK_SPR_MAIN }
+		pulling : { id:121, max_frames:12 }
+		front : { id:122, max_frames:12 }
 		big_image : { pack:PACK_UNLOADED, id:25, offset:FIGURE_SLED_PULLER }
 	}
 

@@ -353,6 +353,7 @@ public:
     void draw_map_flag(vec2i pixel, int highlight, vec2i* coord_out = nullptr);
 
     void advance_figure_tick();
+    void advance_height();
     void set_target_height_bridge();
     void set_target_height_building();
     e_permission get_permission_for_figure();

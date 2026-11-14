@@ -28,6 +28,7 @@
 #include "figure/figure_impl.h"
 #include "figure/formation.h"
 #include "figuretype/figure_bricklayer.h"
+#include "figuretype/figure_sled.h"
 #include "figuretype/figure_carpenter.h"
 #include "figuretype/figure_docker.h"
 #include "figuretype/figure_plagued_citizen.h"
@@ -565,7 +566,7 @@ static int __pyramid_spawn_sled_train(int laborer_fid, int monument_bid) {
         return 0;
     }
     const int before = __test_count_figures(FIGURE_SLED) + __test_count_figures(FIGURE_SLED_PULLER);
-    pyramid_figure_spawn_sled_train((figure_id)laborer_fid, mon);
+    pyramid_figure_spawn_sled_train((figure_id)laborer_fid);
     return (__test_count_figures(FIGURE_SLED) + __test_count_figures(FIGURE_SLED_PULLER)) - before;
 }
 ANK_FUNCTION_2(__pyramid_spawn_sled_train);
@@ -591,6 +592,38 @@ static int __pyramid_count_sled_train_followers(int laborer_fid) {
     return n;
 }
 ANK_FUNCTION_1(__pyramid_count_sled_train_followers);
+
+// Train member at position (1 = right behind the laborer) whose leader is laborer_fid, 0 when none.
+static int __pyramid_train_member(int laborer_fid, int position) {
+    for (int id = 1; id < MAX_FIGURES; ++id) {
+        figure* f = figure_get(id);
+        if (!f || !f->is_alive() || (f->type != FIGURE_SLED && f->type != FIGURE_SLED_PULLER)) {
+            continue;
+        }
+        int pos = 0;
+        if (pyramid_figure_find_train_leader((figure_id)id, &pos) == (figure_id)laborer_fid && pos == position) {
+            return id;
+        }
+    }
+    return 0;
+}
+ANK_FUNCTION_2(__pyramid_train_member);
+
+// Puts a sled on a ramp walk (previous_height < height) or back on the ground.
+static int __test_sled_set_on_ramp(int fid, int on_ramp) {
+    figure* f = figure_get(fid);
+    auto* sled = f ? smart_cast<figure_sled>(f) : nullptr;
+    if (!sled) {
+        return 0;
+    }
+    auto& rd = sled->runtime_data();
+    rd.walk_mode = on_ramp ? PYRAMID_WALK_ALONG_X : PYRAMID_WALK_NONE;
+    rd.climb.previous_height = 0;
+    rd.climb.height = on_ramp ? 1 : 0;
+    sled->update_animation();
+    return 1;
+}
+ANK_FUNCTION_2(__test_sled_set_on_ramp);
 
 // Snap bricklayer/carpenter to monument access_point, start_climb, enter CLIMB_RAMP.
 static int __pyramid_figure_begin_climb(int fid) {

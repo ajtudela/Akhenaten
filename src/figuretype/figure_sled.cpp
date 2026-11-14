@@ -12,26 +12,25 @@ void figure_sled::figure_action() {
 }
 
 void figure_sled::update_animation() {
-    xstring animkey;
-    switch (base.resource_id) {
-    case RESOURCE_STONE: animkey = "stone"; break;
-    case RESOURCE_LIMESTONE: animkey = "limestone"; break;
-    case RESOURCE_GRANITE: animkey = "granite"; break;
-    case RESOURCE_SANDSTONE: animkey = "sandstone"; break;
-    case RESOURCE_MARBLE: animkey = "marble"; break;
-    case RESOURCE_COPPER: animkey = "copper"; break;
-    case RESOURCE_CLAY: animkey = "clay"; break;
-    case RESOURCE_BRICKS: animkey = "bricks"; break;
-
-    default:
-        animkey = "empty";
-        break;
+    const auto& p = current_params();
+    const resource_image_t* image = &p.default_image;
+    for (const auto& entry : p.resource_images) {
+        if (entry.resource == base.resource_id) {
+            image = &entry;
+            break;
+        }
     }
 
-    image_set_animation(animkey);
+    const auto& rd = runtime_data();
+    const bool on_ramp = rd.walk_mode != PYRAMID_WALK_NONE && rd.climb.previous_height < rd.climb.height;
+    image_set_animation(on_ramp ? image->ramp : image->ground);
 }
 
 void figure_sled_puller::figure_action() {
     OZZY_PROFILER_FUNCTION();
     pyramid_figure_train_follow(id(), 0);
+}
+
+void figure_sled_puller::update_animation() {
+    image_set_animation(runtime_data().side ? animkeys().pulling : animkeys().front);
 }

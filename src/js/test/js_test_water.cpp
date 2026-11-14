@@ -3,6 +3,7 @@
 #include "building/building.h"
 #include "building/building_delivery_path.h"
 #include "building/building_dock.h"
+#include "building/building_ferry.h"
 #include "building/building_fishing_wharf.h"
 #include "building/building_shipyard.h"
 #include "building/building_storage_yard.h"
@@ -374,3 +375,42 @@ static void __test_floods_update_next_params() {
     g_floods.update_next_flood_params();
 }
 ANK_FUNCTION(__test_floods_update_next_params);
+
+// Queue fid at a ferry landing the way building_ferry::try_enter_ferry does.
+static int __test_ferry_landing_enqueue(int bid, int fid) {
+    building* b = building_get(bid);
+    auto* landing = b ? b->dcast_ferry() : nullptr;
+    figure* f = figure_get(fid);
+    if (!landing || !f || !f->is_alive() || !landing->queue_push((figure_id)fid)) {
+        return 0;
+    }
+    f->action_state_before_attack = (uint8_t)f->action_state;
+    f->action_state = f->dcast()->ferry_wait_action();
+    f->route_remove();
+    return 1;
+}
+ANK_FUNCTION_2(__test_ferry_landing_enqueue);
+
+static int __test_ferry_boat_load(int boat_fid, int bid) {
+    figure* boat_f = figure_get(boat_fid);
+    auto* boat = boat_f ? boat_f->dcast_ferry_boat() : nullptr;
+    building* b = building_get(bid);
+    auto* landing = b ? b->dcast_ferry() : nullptr;
+    if (!boat || !landing) {
+        return -1;
+    }
+    boat->load_passengers(landing, figure_ferry_boat::PASSENGER_SLOTS);
+    return boat->passenger_count();
+}
+ANK_FUNCTION_2(__test_ferry_boat_load);
+
+static void __test_ferry_boat_unload(int boat_fid, int bid) {
+    figure* boat_f = figure_get(boat_fid);
+    auto* boat = boat_f ? boat_f->dcast_ferry_boat() : nullptr;
+    building* b = building_get(bid);
+    auto* landing = b ? b->dcast_ferry() : nullptr;
+    if (boat && landing) {
+        boat->unload_passengers(landing);
+    }
+}
+ANK_FUNCTION_2(__test_ferry_boat_unload);

@@ -103,8 +103,10 @@ Building.prototype.spawn_service_walker = function(params, figure_type, action) 
         return
     }
 
+    // Without spawn_delays the building uses OG delays_fast, the C++ figure_spawn_timer table.
+    var delay = params.spawn_delays ? this.spawn_delay_by_workers(params.spawn_delays, pct) : this.figure_spawn_timer()
     this.figure_spawn_delay = (this.figure_spawn_delay + 1) & 0xff
-    if (this.figure_spawn_delay <= this.spawn_delay_by_workers(params.spawn_delays, pct)) {
+    if (this.figure_spawn_delay <= delay) {
         return
     }
 

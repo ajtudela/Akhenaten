@@ -32,6 +32,8 @@ enum e_laborer_action : uint16_t {
     ACTION_34_LABORER_SLED_TO_CAESAREUM = 34,
     ACTION_35_LABORER_SLED_TO_LIGHTHOUSE = 35,
     ACTION_36_LABORER_SLED_TO_TOMB = 36,
+    // Remake (gameplay_change_mastaba_clay_delivery): clay pulled to a mastaba on a sled train.
+    ACTION_37_LABORER_SLED_TO_MASTABA = 37,
 
     // Non-OG sentinel: do_gotobuilding / do_goto route-lost → poof (removed in later commits).
     ACTION_14_LABORER_ROUTE_LOST = 14,
@@ -125,6 +127,9 @@ private:
     void sled_to_monument_tick(building *monument);
     bool assign_lamp_delivery(building *tomb);
     void at_storage_yard_lamps();
+    bool assign_clay_delivery(building* mastaba);
+    void at_storage_yard_clay();
+    bool hauls_to_site() const;
     void sled_to_tomb_tick(building *tomb);
     void enter_idle_pool();
     void finish_block_delivery();

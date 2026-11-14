@@ -361,6 +361,11 @@ int mastaba_engine_try_assign_bricklayer(building *main, figure_id fid) {
     if (!mon || !mon->is_unfinished() || mon->phase() < MASTABA_PHASE_BRICKS) {
         return 0;
     }
+    if (auto* mastaba = mon->dcast_mastaba()) {
+        if (!mastaba->clay_stock_ready()) {
+            return 0;
+        }
+    }
     auto *ms = pyramid_main_state_get(head->id);
     if (!ms) {
         mastaba_engine_init(head);

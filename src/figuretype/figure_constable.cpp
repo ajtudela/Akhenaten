@@ -3,6 +3,7 @@
 #include "city/city.h"
 #include "core/calc.h"
 #include "figure/enemy_army.h"
+#include "building/building_storage_yard.h"
 #include "figure/service.h"
 #include "figuretype/figure_native.h"
 #include "figuretype/figure_tomb_robber.h"
@@ -23,7 +24,46 @@ void figure_constable::figure_before_action() {
 }
 
 void figure_constable::figure_action() {
+    if (action_state() == ACTION_74_CONSTABLE_REQUESTING_WEAPONS && !base.in_attack()) {
+        request_weapons_remake();
+        return;
+    }
     law_walker_action(true);
+}
+
+// Remake police weapons (gameplay_change_police_weapons): the constable walks to a storage yard and leaves a
+// weapons request there for the yard to deliver to its station.
+void figure_constable::request_weapons_remake() {
+    base.terrain_usage = TERRAIN_USAGE_ROADS;
+    building* yard_building = has_destination() ? destination() : nullptr;
+    building_storage_yard* yard = yard_building ? yard_building->dcast_storage_yard() : nullptr;
+    if (yard && direction() != DIR_FIGURE_NONE) {
+        base.move_ticks(1);
+        if (direction() != DIR_FIGURE_CAN_NOT_REACH) {
+            return;
+        }
+        yard = nullptr;
+    }
+
+    if (yard) {
+        auto& requests = yard->runtime_data().police_station_weapon_requests;
+        const building_id station_id = home()->id;
+        if (std::find(requests.begin(), requests.end(), station_id) == requests.end()) {
+            const auto empty_it = std::find(requests.begin(), requests.end(), 0);
+            if (empty_it != requests.end()) {
+                *empty_it = station_id;
+            }
+        }
+    }
+
+    const tile2i road = home_road();
+    if (!road.valid()) {
+        poof();
+        return;
+    }
+    advance_action(ACTION_73_CONSTABLE_RETURNING);
+    base.destination_tile = road;
+    route_remove();
 }
 
 tile2i figure_constable::home_road() const {

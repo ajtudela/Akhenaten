@@ -118,6 +118,7 @@ game_features {
     @gameplay_change_follower_runaway {}
     @gameplay_change_robber_remake {}
     @gameplay_change_tomb_robber_remake {}
+    @gameplay_change_police_weapons {}
     @gameplay_change_walker_phrases_remake {}
     @gameplay_change_protestor_hunt_nobles {}
     @gameplay_change_fishing_boat_remake {}

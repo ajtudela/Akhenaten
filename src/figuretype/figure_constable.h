@@ -7,6 +7,7 @@ enum e_constable_action {
     ACTION_71_CONSTABLE_ENTERING_EXITING = 71,
     ACTION_72_CONSTABLE_ROAMING = 72,
     ACTION_73_CONSTABLE_RETURNING = 73,
+    ACTION_74_CONSTABLE_REQUESTING_WEAPONS = 74,
     ACTION_76_CONSTABLE_CHASE = 76,
 };
 
@@ -50,6 +51,7 @@ public:
     figure_id closest_enemy(int max_distance) const;
     tile2i home_road() const;
     void arrest_tomb_robber_remake();
+    void request_weapons_remake();
 };
 ANK_CONFIG_STRUCT(figure_constable::static_params, home_road_radius, crime_reduction, enemy_search_ticks,
   enemy_search_distance, native_distance_factor, enemy_distance_factor, animal_distance_factor, chased_animals,

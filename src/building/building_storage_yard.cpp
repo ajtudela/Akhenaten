@@ -4,6 +4,7 @@
 #include "building/building_barracks.h"
 #include "building/building_storage_room.h"
 #include "building/building_granary.h"
+#include "building/building_police_station.h"
 #include "city/city_industry.h"
 #include "building/rotation.h"
 #include "building/monuments.h"
@@ -471,6 +472,45 @@ storage_worker_task building_storage_yard_determine_getting_up_resources(buildin
     return {STORAGEYARD_TASK_NONE};
 }
 
+storage_worker_task building_storageyard_deliver_weapons_to_police_stations(building* b) {
+    if (!game_features::gameplay_change_police_weapons.to_bool()) {
+        return {STORAGEYARD_TASK_NONE};
+    }
+
+    building_storage_yard* warehouse = b->dcast_storage_yard();
+    if (!warehouse) {
+        return {STORAGEYARD_TASK_NONE};
+    }
+
+    auto& requests = warehouse->runtime_data().police_station_weapon_requests;
+    if (requests.empty()) {
+        return {STORAGEYARD_TASK_NONE};
+    }
+
+    int weapons_available = warehouse->amount(RESOURCE_WEAPONS);
+    if (weapons_available <= 0) {
+        return {STORAGEYARD_TASK_NONE};
+    }
+
+    for (size_t i = 0; i < requests.size(); ++i) {
+        building_id station_id = requests[i];
+        building* station = building_get(station_id);
+        if (!station || !station->is_valid() || station->type != BUILDING_POLICE_STATION) {
+            requests[i] = 0;
+            continue;
+        }
+
+        if (station->road_network_id != warehouse->road_network()) {
+            continue;
+        }
+
+        int amount_to_send = std::min(50, weapons_available);
+        return {STORAGEYARD_TASK_POLICE_STATION, &warehouse->base, amount_to_send, RESOURCE_WEAPONS, station};
+    }
+
+    return {STORAGEYARD_TASK_NONE};
+}
+
 static int storageyard_available(building_storage_yard *warehouse, e_resource resource) {
     int available = 0;
     auto space = warehouse->room();
@@ -874,18 +914,19 @@ storage_worker_task building_storage_yard::determine_worker_task() {
     }
 
     using action_type = decltype(building_storageyard_deliver_weapons);
-    action_type *actions[] = {
-        &building_storage_yard_determine_getting_up_resources,      // getting up resources
-        &building_storageyard_deliver_weapons,                      // deliver weapons to barracks
-        &building_storageyard_deliver_resource_to_zoo,              // straw / game meat to zoo (before workshops — straw contested)
-        &building_storageyard_deliver_resource_to_workshop,         // deliver raw materials to workshops
-        &building_storageyard_deliver_papyrus_to_scribal_school,    // deliver papyrus materials to scribal school
-        &building_storageyard_deliver_beer_to_senet_house,          // deliver beer to senet house
-        &building_storageyard_deliver_timber_to_shipyard_school,    // deliver timber to shipyard
-        &building_storage_yard::deliver_food_to_gettingup_granary,  // deliver food to getting granary
-        &building_storageyard_deliver_food_to_accepting_granary,    // deliver food to accepting granary
-        &building_storage_yard_deliver_emptying_resources,          // emptying resource
-        &building_storageyard_deliver_to_monuments,                 // monuments resource
+    action_type* actions[] = {
+      &building_storage_yard_determine_getting_up_resources,    // getting up resources
+      &building_storageyard_deliver_weapons_to_police_stations, // deliver weapons to police stations
+      &building_storageyard_deliver_weapons,                    // deliver weapons to barracks
+      &building_storageyard_deliver_resource_to_zoo, // straw / game meat to zoo (before workshops — straw contested)
+      &building_storageyard_deliver_resource_to_workshop,        // deliver raw materials to workshops
+      &building_storageyard_deliver_papyrus_to_scribal_school,   // deliver papyrus materials to scribal school
+      &building_storageyard_deliver_beer_to_senet_house,         // deliver beer to senet house
+      &building_storageyard_deliver_timber_to_shipyard_school,   // deliver timber to shipyard
+      &building_storage_yard::deliver_food_to_gettingup_granary, // deliver food to getting granary
+      &building_storageyard_deliver_food_to_accepting_granary,   // deliver food to accepting granary
+      &building_storage_yard_deliver_emptying_resources,         // emptying resource
+      &building_storageyard_deliver_to_monuments,                // monuments resource
     };
 
     for (const auto &action : actions) {
@@ -1030,6 +1071,23 @@ void building_storage_yard::spawn_figure() {
             remove_resource(task.resource, task.amount);
             break;
 
+        case STORAGEYARD_TASK_POLICE_STATION:
+            if (task.resource == RESOURCE_WEAPONS && task.dest && task.dest->type == BUILDING_POLICE_STATION) {
+                task.amount = std::min<int>(task.amount, 400);
+                cart->load_resource(task.resource, task.amount);
+                remove_resource(task.resource, task.amount);
+
+                cart->base.destination_tile = task.dest->road_access;
+                cart->set_destination(task.dest->id);
+                cart->advance_action(ACTION_51_WAREHOUSECART_DELIVERING_RESOURCE);
+                auto& requests = runtime_data().police_station_weapon_requests;
+                for (auto& it : requests) {
+                    if (it == task.dest->id) {
+                        it = 0;
+                    }
+                }
+            }
+            break;
 
         default:
             verify_no_crash(false);

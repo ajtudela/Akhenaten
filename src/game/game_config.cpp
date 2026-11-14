@@ -19,7 +19,7 @@ void ANK_REGISTER_CONFIG_ITERATOR(config_load_game_settings) {
 }
 
 namespace game_features {
-    svector<game_feature*, 192> _features;
+    svector<game_feature*, 256> _features;
     globals_settings_t _settings;
 
     game_feature gameplay_fix_immigration{ "gameplay_fix_immigration", "#TR_CONFIG_FIX_IMMIGRATION_BUG", false, false };
@@ -69,6 +69,9 @@ namespace game_features {
     game_feature gameplay_change_robber_remake{ "gameplay_change_robber_remake", "#TR_CONFIG_ROBBER_REMAKE", false, false };
     // Remake tomb robber: monthly/sentiment spawn, flee/arrest, fixed −10/−25. OG: house crime, wait 40, 2× walk, difficulty kingdom hit, die.
     game_feature gameplay_change_tomb_robber_remake{ "gameplay_change_tomb_robber_remake", "#TR_CONFIG_TOMB_ROBBER_REMAKE", false, false };
+    // Remake police: stations fetch weapons from storage yards, each constable takes one. OG: no weapons.
+    game_feature gameplay_change_police_weapons{
+      "gameplay_change_police_weapons", "#TR_CONFIG_POLICE_WEAPONS", false, false};
     // Remake walker phrases: per-walker script heuristics, also for walkers OG keeps silent. OG: city problems by
     // weight.
     game_feature gameplay_change_walker_phrases_remake{

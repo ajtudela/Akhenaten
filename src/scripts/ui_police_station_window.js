@@ -3,7 +3,10 @@ log_info("akhenaten: ui police station info window started")
 [es=building_info_window]
 info_window_police_station {
     related_buildings [BUILDING_POLICE_STATION]
-    ui : baseui(building_info_window, {})
+    ui : baseui(building_info_window, {
+        weapon_icon     : resource_icon({ pos[32, 205], resource:RESOURCE_WEAPONS })
+        weapon_stored   : text({ pos[55, 210], size[px(27), 20], font:FONT_NORMAL_BLACK_ON_LIGHT })
+    })
 }
 
 [es=(info_window_police_station, init)]
@@ -30,4 +33,9 @@ function info_window_police_station_on_init(window) {
 
     var workers_desc = Math.approximate_value(b.worker_percentage / 100.0, [8, 7, 6, 5, 4])
     window.workers_desc.text = __loc(b.meta_text_id, workers_desc)
+
+    var weapons = game_features.get('gameplay_change_police_weapons')
+    window.weapon_icon.enabled = weapons
+    window.weapon_stored.enabled = weapons
+    window.weapon_stored.text = String(b.stored_resource(RESOURCE_WEAPONS))
 }

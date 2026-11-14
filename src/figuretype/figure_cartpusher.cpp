@@ -180,6 +180,7 @@ void figure_cartpusher::do_deliver(bool warehouseman, int action_done, int actio
             case BUILDING_INDUSTRY_OFFICE:
             case BUILDING_SENET_HOUSE:
             case BUILDING_ZOO:
+            case BUILDING_POLICE_STATION:
             case BUILDING_VILLAGE_PALACE:
             case BUILDING_TOWN_PALACE:
             case BUILDING_CITY_PALACE: {

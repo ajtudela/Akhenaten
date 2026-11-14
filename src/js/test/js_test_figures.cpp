@@ -588,3 +588,9 @@ static void __test_figure_set_resource(int fid, int resource) {
     }
 }
 ANK_FUNCTION_2(__test_figure_set_resource);
+
+static int __test_figure_get_leading(int fid) {
+    figure* f = figure_get(fid);
+    return f ? (int)f->leading_figure_id : -1;
+}
+ANK_FUNCTION_1(__test_figure_get_leading);

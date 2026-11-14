@@ -423,6 +423,15 @@ void figure_worker::enter_idle_pool() {
     advance_action(ACTION_8_LABORER_IDLE);
 }
 
+void figure_worker::drop_load() {
+    auto& rd = runtime_data();
+    figure* mason = rd.mason_fid ? figure_get(rd.mason_fid) : nullptr;
+    if (mason && mason->leading_figure_id == id()) {
+        mason->leading_figure_id = 0;
+    }
+    enter_idle_pool();
+}
+
 void figure_worker::finish_block_delivery() {
     auto &rd = runtime_data();
     pyramid_engine_laborer_deliver_block(rd.mason_fid);

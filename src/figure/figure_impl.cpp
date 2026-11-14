@@ -523,6 +523,10 @@ void figure_impl::start_follower_runaway() {
         return;
     }
 
+    begin_runaway();
+}
+
+void figure_impl::begin_runaway() {
     base.leading_figure_id = 0;
     route_remove();
     base.destination_tile = g_city.map.exit_point;

@@ -1681,6 +1681,42 @@ void monument_pyramid_figure::spawn_single_sled(figure_id laborer_fid) {
     }
 }
 
+// Remake (gameplay_change_sled_pullers_flee): the pullers run off, the sled keeps the laborer's load
+// where it stands and the laborer goes back to its camp empty-handed.
+void monument_pyramid_figure::drop_train(figure_id member_fid) {
+    int position = 0;
+    const figure_id leader_id = find_train_leader(member_fid, &position);
+    figure* laborer = figure_get(leader_id);
+    if (!laborer || !laborer->is_alive()) {
+        return;
+    }
+
+    svector<figure*, LABORER_TRAIN_MAX_LINKS> members;
+    for (figure* f : map_figures()) {
+        if (!f || !f->is_alive() || (f->type != FIGURE_SLED && f->type != FIGURE_SLED_PULLER) || members.full()) {
+            continue;
+        }
+        if (find_train_leader(f->id, &position) == leader_id) {
+            members.push_back(f);
+        }
+    }
+
+    for (figure* m : members) {
+        if (m->type == FIGURE_SLED) {
+            m->action_state = ACTION_9_SLED_DROPPED;
+            m->leading_figure_id = 0;
+            m->resource_amount_full = laborer->resource_amount_full;
+            m->set_flag(e_figure_flag_invisible, false);
+        } else {
+            m->dcast()->begin_runaway();
+        }
+    }
+
+    if (auto* worker = laborer->dcast_worker()) {
+        worker->drop_load();
+    }
+}
+
 figure* monument_pyramid_figure::create_sled(figure* laborer, figure_id front_id) {
     figure* sled = figure_create(FIGURE_SLED, laborer->tile, 0);
     if (!sled || !sled->id) {

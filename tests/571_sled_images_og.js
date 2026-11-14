@@ -1,5 +1,5 @@
 // OG figure_sled_action / figure_sled_puller_action images, enemy.c missile skip of FIGURE_SLED,
-// Figure_model category 0 for sled and puller, building_info.c draw_walker_info (no sled portrait,
+// Figure_model category 0 for the sled, building_info.c draw_walker_info (no sled portrait,
 // a laborer with a partner reads as a sled puller).
 
 var ACTION_17_LABORER_TO_PYRAMID = 17
@@ -80,8 +80,8 @@ function run_test() {
     }
     __log_marker('t571_pullers_alternate_ok')
 
-    if (__test_figure_type_category(FIGURE_SLED) != 0 || __test_figure_type_category(FIGURE_SLED_PULLER) != 0) {
-        return t571_fail('sled/puller category want 0 got ' + __test_figure_type_category(FIGURE_SLED) + '/' + __test_figure_type_category(FIGURE_SLED_PULLER))
+    if (__test_figure_type_category(FIGURE_SLED) != 0) {
+        return t571_fail('sled category want 0 got ' + __test_figure_type_category(FIGURE_SLED))
     }
     var ltile = __figure_get_tile(lab)
     var stile = { x: ltile.x + 6, y: ltile.y }

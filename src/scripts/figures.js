@@ -663,9 +663,10 @@ figure_sled_puller = {
 		big_image : { pack:PACK_UNLOADED, id:25, offset:FIGURE_SLED_PULLER }
 	}
 
-	// OG Figure_model "Stone Puller": category 0, never fought in melee.
-	category: figure_category_inactive
+	category: figure_category_citizen
 	max_damage: 100
+	// Remake gameplay_change_sled_pullers_flee: an enemy this close makes the pullers drop the sled.
+	flee_enemy_distance: 8
 	terrain_usage: TERRAIN_USAGE_ANY,
 }
 

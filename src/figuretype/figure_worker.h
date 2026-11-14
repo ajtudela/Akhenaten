@@ -117,6 +117,8 @@ public:
     }
     void find_work();
     e_resource block_material_for(building *monument, figure_id mason_fid) const;
+    // Its sled was left behind: free the mason for another laborer and go back idle.
+    void drop_load();
 
 private:
     bool uses_ramp_climb(building *monument) const;

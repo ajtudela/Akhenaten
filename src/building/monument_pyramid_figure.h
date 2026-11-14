@@ -48,6 +48,7 @@ public:
     void spawn_sled_train(figure_id laborer_fid);
     void spawn_single_sled(figure_id laborer_fid);
     figure* create_sled(figure* laborer, figure_id front_id);
+    void drop_train(figure_id member_fid);
 
     building_id find_mason_waiting_for_block(building *head, int clear_partner);
     void sort_frontier(building_id* parts, int count) const;

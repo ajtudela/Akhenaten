@@ -180,7 +180,6 @@ void figure_cartpusher::do_deliver(bool warehouseman, int action_done, int actio
             case BUILDING_INDUSTRY_OFFICE:
             case BUILDING_SENET_HOUSE:
             case BUILDING_ZOO:
-            case BUILDING_POLICE_STATION:
             case BUILDING_VILLAGE_PALACE:
             case BUILDING_TOWN_PALACE:
             case BUILDING_CITY_PALACE: {
@@ -389,13 +388,6 @@ void figure_cartpusher::determine_storageyard_cart_destination() {
     ////// delivering resource!
     // Remake-only consumers (not in OG warehouseman_initial_yard).
     if (!og) {
-        if (base.resource_id == RESOURCE_WEAPONS && has_destination()) {
-            building* dest = destination();
-            if (dest && dest->type == BUILDING_POLICE_STATION) {
-                return advance_action(ACTION_51_CARTPUSHER_DELIVERING_RESOURCE);
-            }
-        }
-
         if (base.resource_id == RESOURCE_PAPYRUS) {
             const e_building_type consumers[] = { BUILDING_SCRIBAL_SCHOOL, BUILDING_LIBRARY, BUILDING_INDUSTRY_OFFICE };
             for (e_building_type consumer : consumers) {

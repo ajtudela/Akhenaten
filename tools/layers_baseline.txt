@@ -144,8 +144,6 @@ building/building_plaza.cpp -> sound/sound_building.h
 building/building_plaza.cpp -> window/building/common.h
 building/building_plaza.cpp -> window/building/figures.h
 building/building_plaza.cpp -> window/window_figure_info.h
-building/building_police_station.cpp -> graphics/elements/ui.h
-building/building_police_station.cpp -> window/building/common.h
 building/building_road.cpp -> graphics/graphics.h
 building/building_road.cpp -> graphics/image.h
 building/building_roadblock.cpp -> graphics/elements/ui.h

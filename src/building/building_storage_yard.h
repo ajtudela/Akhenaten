@@ -11,7 +11,6 @@ enum e_storageyard_task {
     STORAGEYARD_TASK_DELIVERING = 1,
     STORAGEYARD_TASK_EMPTYING = 2,
     STORAGEYARD_TASK_MONUMENT = 3,
-    STORAGEYARD_TASK_POLICE_STATION = 4,
     //
     STORAGEYARD_TASK_GETTING_MOAR = 9,
 };
@@ -40,7 +39,6 @@ public:
 
     struct runtime_data_t {
         int reserved;
-        std::array<building_id, 4> police_station_weapon_requests;
     } BUILDING_RUNTIME_DATA_T;
 
     virtual void on_create(int orientation) override;

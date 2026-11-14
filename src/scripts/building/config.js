@@ -720,21 +720,9 @@ building_police_station = {
     base { pack:PACK_GENERAL, id:64 },
     work { pos[20, -40], pack:PACK_GENERAL, id:64, offset:1, max_frames:12 },
   }
-  overlay_anims {
-    weapons {
-      pos: [20, -20]
-      pack: PACK_GENERAL
-      id: 99
-      offset: 12
-      resource: RESOURCE_WEAPONS
-      stack: true
-      max_count: 1
-      default_active: true
-    }
-  }
 
   labor_category : LABOR_CATEGORY_INFRASTRUCTURE
-  min_houses_coverage : 50
+  min_houses_coverage : 100
   meta : { text_id: 88, help_link:"message_building_police_station" }
   building_size : 1
   cost [ 6, 24, 30, 36, 45 ]

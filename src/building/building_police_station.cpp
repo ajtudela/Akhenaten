@@ -1,133 +1,26 @@
 #include "building_police_station.h"
 
-#include "city/object_info.h"
-#include "window/building/common.h"
-#include "graphics/elements/ui.h"
 #include "figuretype/figure_constable.h"
-#include "building/building_storage_yard.h"
-#include "building/building.h"
-#include "city/buildings.h"
-#include "core/calc.h"
-#include "grid/road_access.h"
-#include "game/resource.h"
-#include "grid/road_network.h"
-#include "city/city_buildings.h"
 #include "js/js_game.h"
 
-BUILDING_RUNTIME_DATA_IMPL(building_police_station)
 REPLICATE_STATIC_PARAMS_FROM_CONFIG(building_police_station);
-
-bool building_police_station::request_weapons_if_need() {
-    auto &d = runtime_data();
-    if (d.weapon_requested_this_month) {
-        return false;
-    }
-
-    if (stored_amount(RESOURCE_WEAPONS) > 50) {
-        return false;
-    }
-
-    if (has_figure_of_type(BUILDING_SLOT_SERVICE, FIGURE_CONSTABLE)) {
-        return false;
-    }
-
-    int min_dist = 10000;
-    building_id closest_warehouse_id = 0;
-    int road_network_id = map_road_network_get(base.tile);
-    d.weapon_requested_this_month = true;
-
-    buildings_valid_do([&](building &b) {
-        building_storage_yard * warehouse = b.dcast_storage_yard();
-
-        if (!warehouse->has_road_access() || warehouse->base.distance_from_entry <= 0) {
-            return;
-        }
-
-        if (warehouse->road_network() != road_network_id) {
-            return;
-        }
-
-        int weapons_amount = warehouse->amount(RESOURCE_WEAPONS);
-        if (weapons_amount > 50) {
-            int dist = calc_distance_with_penalty(warehouse->tile(), base.tile, warehouse->base.distance_from_entry, base.distance_from_entry);
-            if (dist < min_dist) {
-                min_dist = dist;
-                closest_warehouse_id = warehouse->id();
-            }
-        }
-    }, BUILDING_STORAGE_YARD);
-
-    if (closest_warehouse_id > 0) {
-        figure *f = create_roaming_figure(FIGURE_CONSTABLE, (e_figure_action)ACTION_74_CONSTABLE_REQUESTING_WEAPONS, BUILDING_SLOT_SERVICE);
-        if (f) {
-            building *warehouse = building_get(closest_warehouse_id);
-            tile2i warehouse_tile;
-            if (warehouse->has_road_access) {
-                map_point_store_result(warehouse->road_access, warehouse_tile);
-            } else {
-                warehouse_tile = map_has_road_access_rotation(warehouse->orientation, warehouse->tile, 3);
-            }
-            if (warehouse_tile.valid()) {
-                f->destination_tile = warehouse_tile;
-                f->set_destination(closest_warehouse_id);
-            }
-        }
-        return true;
-    }
-
-    return false;
-}
 
 void building_police_station::spawn_figure() {
     check_labor_problem();
-    if (!has_road_access()) {
+    if (has_figure(BUILDING_SLOT_SERVICE) || !has_road_access()) {
         return;
     }
 
     common_spawn_labor_seeker(current_params().min_houses_coverage);
 
-    int pct_workers = worker_percentage();
-    int spawn_delay = figure_spawn_timer();
+    const int spawn_delay = figure_spawn_timer();
     if (spawn_delay == -1) {
         return;
     }
 
-    if (has_figure(BUILDING_SLOT_SERVICE)) {
-        return;
-    }
-
     base.figure_spawn_delay++;
-
     if (base.figure_spawn_delay > spawn_delay) {
-        const bool requested_weapons = request_weapons_if_need();
-        if (requested_weapons) {
-            base.figure_spawn_delay = 0;
-            return;
-        }
-    }
-
-    if (base.figure_spawn_delay > spawn_delay) {
-        if (stored_amount(RESOURCE_WEAPONS) > 0) {
-            consume_resource(RESOURCE_WEAPONS, 1);
-        }
-
         base.figure_spawn_delay = 0;
         create_roaming_figure(FIGURE_CONSTABLE, (e_figure_action)ACTION_70_CONSTABLE_CREATED, BUILDING_SLOT_SERVICE);
     }
-}
-
-void building_police_station::update_month() {
-    building_impl::update_month();
-
-    auto &d = runtime_data();
-    d.weapon_requested_this_month = false;
-}
-
-bool building_police_station::add_resource(e_resource resource, int amount, figure_id fid) {
-    if (resource == RESOURCE_WEAPONS) {
-        int max_storage = 200;
-        store_resource(RESOURCE_WEAPONS, amount);
-        return true;
-    }
-    return false;
 }

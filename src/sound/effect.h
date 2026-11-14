@@ -44,6 +44,7 @@ enum e_sound_effect {
     SOUND_EFFECT_DANCER_DIE = 45,
 
     SOUND_EFFECT_FLOODED = 46,
+    SOUND_EFFECT_POLICE_ATTACK = 47,
 };
 
 // OG sound_play.h / effect.c ids. e_sound_effect above is the Caesar III list the call sites still use;
@@ -64,6 +65,7 @@ enum e_og_figure_sound {
     OG_FIGURE_SOUND_OSTRICH = 4,
     OG_FIGURE_SOUND_ANTELOPE = 5,
     OG_FIGURE_SOUND_BIRDS = 8,
+    OG_FIGURE_SOUND_POLICE = 10,
     OG_FIGURE_SOUND_ARCHER = 11,
     OG_FIGURE_SOUND_INFANTRY = 12,
     OG_FIGURE_SOUND_CHARIOT = 13,

@@ -30,14 +30,24 @@ function run_test() {
     test_ensure_city_session('data/default.map')
     __test_city_problem_calm()
 
-    // Constable actions have no script names: 72 roaming, 150 attack.
+    // Constable actions have no script names: 72 roaming. OG FIGURE_ACTION_ATTACK is our attack flag.
     var constable = test522_walker(FIGURE_CONSTABLE)
     __test_figure_set_phrase_state(constable, 72, 50)
     var ok = test522_expect('constable low crime', __test_figure_phrase(constable), '0:10:police_e01.wav')
     __test_figure_set_phrase_state(constable, 72, 150)
     ok = test522_expect('constable crime', __test_figure_phrase(constable), '13:11:police_e02.wav') && ok
     // Third call: the phrase sequence is 3, a fight says 14 + 3.
-    __test_figure_set_phrase_state(constable, 150, 0)
+    __test_figure_set_phrase_state(constable, 72, 0)
+    var ct = __figure_get_tile(constable)
+    var robber = __test_figure_create(FIGURE_ROBBER, ct.x, ct.y)
+    if (!robber) {
+        __log_info_native('[test:522] cannot create robber')
+        ok = false
+    }
+    if (__test_figure_combat_attack_at(constable, ct.x, ct.y) != 1) {
+        __log_info_native('[test:522] constable must start a fight with a robber on its tile')
+        ok = false
+    }
     ok = test522_expect('constable fight', __test_figure_phrase(constable), '0:17:police_e08.wav') && ok
     if (ok) {
         __log_marker('phrase_constable_ok')

@@ -16,7 +16,6 @@
 #include "figuretype/figure_caravan_donkey.h"
 #include "figuretype/figure_carpenter.h"
 #include "figuretype/figure_cartpusher.h"
-#include "figuretype/figure_constable.h"
 #include "figuretype/figure_docker.h"
 #include "figuretype/figure_fireman.h"
 #include "figuretype/figure_fishing_boat.h"
@@ -613,7 +612,7 @@ namespace {
 
         case FIGURE_CONSTABLE:
             st.next_sequence(4, 0);
-            if (action == ACTION_150_CONSTABLE_ATTACK) {
+            if (f.in_attack()) {
                 if (is_crime_figure(f.target_figure_id) || is_crime_figure(f.targeted_by_figure_id)) {
                     st.say(ADVISOR_CHIEF, 13);
                 } else {

@@ -1027,6 +1027,8 @@ static og_effect_ref og_effect_for(int effect) {
         return og_figure(OG_FIGURE_SOUND_SHIP, OG_FIGURE_SOUND_VARIANT_HIT);
     case SOUND_EFFECT_LION_ATTACK:
         return og_figure(OG_FIGURE_SOUND_LION, OG_FIGURE_SOUND_VARIANT_HIT);
+    case SOUND_EFFECT_POLICE_ATTACK:
+        return og_figure(OG_FIGURE_SOUND_POLICE, OG_FIGURE_SOUND_VARIANT_HIT);
     case SOUND_EFFECT_LION_DIE:
         return og_figure(OG_FIGURE_SOUND_LION, OG_FIGURE_SOUND_VARIANT_DIE);
     case SOUND_EFFECT_OSTRICH_DIE:

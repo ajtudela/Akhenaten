@@ -25,7 +25,6 @@
 #include "figure/figure_impl.h"
 #include "figure/formation.h"
 #include "figure/formation_batalion.h"
-#include "figuretype/figure_constable.h"
 #include "figuretype/figure_enemy_archer.h"
 #include "figuretype/figure_enemy_elephant.h"
 #include "figuretype/figure_enemy_spearman.h"
@@ -447,15 +446,6 @@ static void __test_barracks_request_tower_sentry() {
     building_barracks_request_tower_sentry();
 }
 ANK_FUNCTION(__test_barracks_request_tower_sentry);
-
-static int __test_constable_try_arrest(int constable_id, int max_distance, int force) {
-    figure* f = figure_get(constable_id);
-    if (!f || !f->is_alive() || f->type != FIGURE_CONSTABLE) {
-        return 0;
-    }
-    return figure_constable(f).try_arrest_criminal(max_distance, force != 0) ? 1 : 0;
-}
-ANK_FUNCTION_3(__test_constable_try_arrest);
 
 static int __test_soldier_combat_target(int x, int y, int max_distance) {
     tile2i tile(x, y);

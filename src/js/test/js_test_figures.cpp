@@ -308,6 +308,17 @@ static int __test_figure_get_formation_id(int fid) {
 }
 ANK_FUNCTION_1(__test_figure_get_formation_id);
 
+static void __test_city_set_security_breach(int duration) {
+    g_city.figures.security_breach_duration = duration;
+}
+ANK_FUNCTION_1(__test_city_set_security_breach);
+
+static int __test_figure_targeted_by(int fid) {
+    figure* f = figure_get(fid);
+    return f ? f->targeted_by_figure_id : 0;
+}
+ANK_FUNCTION_1(__test_figure_targeted_by);
+
 static void __test_buildings_generate_figures() {
     g_city.buildings_generate_figure();
 }

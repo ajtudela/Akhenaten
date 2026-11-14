@@ -480,6 +480,45 @@ resource_tile map_routing_citizen_found_timber(tile2i src) {
     return { found ? RESOURCE_TIMBER : RESOURCE_NONE, dst };
 }
 
+struct first_of_any_search_t {
+    const int* offsets = nullptr;
+    int count = 0;
+    int found = 0;
+
+    int index_of(int offset) const {
+        for (int i = 0; i < count; i++) {
+            if (offsets[i] == offset) {
+                return i + 1;
+            }
+        }
+        return 0;
+    }
+};
+
+static first_of_any_search_t g_first_of_any;
+
+static bool callback_travel_first_of_any(int next_offset, int dist) {
+    if (map_grid_get(routing_land_citizen, next_offset) >= CITIZEN_0_ROAD && !has_fighting_friendly(next_offset)) {
+        enqueue(next_offset, dist);
+        g_first_of_any.found = g_first_of_any.index_of(next_offset);
+        return g_first_of_any.found > 0;
+    }
+    return false;
+}
+
+int map_routing_citizen_find_first_of_any(tile2i src, const int* offsets, int count) {
+    ++g_routing_stats.total_routes_calculated;
+    g_first_of_any = {offsets, count, 0};
+    const int at_source = g_first_of_any.index_of(src.grid_offset());
+    if (at_source > 0) {
+        return at_source;
+    }
+
+    tile2i dst;
+    route_queue_until_found(src.grid_offset(), dst, callback_travel_first_of_any);
+    return g_first_of_any.found;
+}
+
 static void callback_travel_citizen_land(int next_offset, int dist) {
     if (map_terrain_is(next_offset, TERRAIN_FERRY_ROUTE)) {
         return;

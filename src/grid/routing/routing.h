@@ -39,6 +39,8 @@ int map_water_grid(int grid_offset);
 bool map_routing_citizen_found_terrain(tile2i src, tile2i *dst, int terrain_type);
 resource_tile map_routing_citizen_found_reeds(tile2i src);
 resource_tile map_routing_citizen_found_timber(tile2i src);
+// OG map_routing_citizen_find_first_of_any: 1-based index of the first offset a citizen reaches, 0 if none.
+int map_routing_citizen_find_first_of_any(tile2i src, const int* offsets, int count);
 
 bool map_routing_citizen_can_travel_over_land(tile2i src, tile2i dst, bool allow_ferry = false);
 bool map_routing_citizen_can_travel_over_road(tile2i src, tile2i dst, bool allow_ferry = false);
